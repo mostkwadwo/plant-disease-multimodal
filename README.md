@@ -102,4 +102,4 @@ Transformer Integration: Replace ResNet with a Vision Transformer (ViT) for glob
 Edge Deployment: Quantize the model (INT8) for deployment on NVIDIA Jetson devices for field usage.
 
 Author: Evans Agyekum
-Tech Stack: PyTorch, FastAPI, Azure, Docker, Git.
+Tech Stack: PyTorch, FastAPI, Azure, Docker, Git. Linux VM
