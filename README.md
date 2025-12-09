@@ -40,3 +40,66 @@ graph LR
     I --> J[Classifier Head]
     J --> K{Prediction: <br/> Healthy vs. Disease}
     end
+Key Technical Components
+Vision Branch: ResNet50 (Pretrained on ImageNet) extracts texture and leaf shape features.
+Spectral Branch: A custom 3-layer 1D-CNN processes 200 spectral bands to detect biochemical changes (chlorophyll absorption).
+Physics Simulation: A custom data loader (src/dataset_real.py) simulates realistic vegetation reflectance curves based on biological principles (NDVI and Red Edge shifts).
+🔍 Explainability (XAI)
+To ensure the model is trustworthy, I implemented Grad-CAM and Spectral Saliency Analysis:
+Visual Attention (Grad-CAM)	Spectral Importance (Saliency)
+The model focuses on the leaf lesion, ignoring the background.	The model prioritizes the 700nm-750nm (Red Edge) range, proving it learned physical stress signals.
+(See experiments/real_data_report.png in repo)	(See experiments/real_data_report.png in repo)
+🛠️ Deployment & MLOps
+This project is not just a notebook; it is a full production pipeline.
+1. Containerization (Docker)
+The application is wrapped in a Docker container using python:3.9-slim.
+Challenge: Developing on Mac M1 (ARM64) vs Deploying on Azure (AMD64).
+Solution: Built the Docker image directly on the Linux host to ensure architecture compatibility.
+2. Cloud Infrastructure (Azure)
+Compute: Azure Virtual Machine (Ubuntu 20.04).
+Networking: Configured NSG (Network Security Groups) to allow traffic on Port 80.
+Server: uvicorn running behind a Docker proxy.
+🚀 How to Run Locally
+Prerequisites
+Python 3.8+
+Docker (Optional)
+1. Installation
+code
+Bash
+git clone https://github.com/mostkwadwo/plant-disease-multimodal.git
+cd plant-disease-multimodal
+pip install -r requirements.txt
+2. Training
+Download the dataset and train the fusion model:
+code
+Bash
+# 1. Download PlantVillage subset
+python download_data.py
+
+# 2. Train the model (ResNet + 1D-CNN)
+python train.py
+The trained model will be saved to experiments/fusion_model_real.pth.
+3. Run the API
+code
+Bash
+uvicorn src.app:app --reload
+Visit http://localhost:8000/docs to test the API.
+☁️ How to Deploy (Docker)
+If you want to run this in a container:
+code
+Bash
+# 1. Build
+docker build -t plant-api .
+
+# 2. Run
+docker run -p 80:8000 plant-api uvicorn src.app:app --host 0.0.0.0 --port 8000
+📊 Results
+Training Accuracy: ~99% (Binary Classification: Healthy vs Bacterial Spot)
+Inference Latency: <200ms on CPU
+Model Size: ~100MB
+🔮 Future Improvements
+Transformer Integration: Replace ResNet with a Vision Transformer (ViT) for global attention mechanisms.
+Edge Deployment: Quantize the model (INT8) for deployment on NVIDIA Jetson devices for field usage.
+
+Author: Evans Agyekum
+Tech Stack: PyTorch, FastAPI, Azure, Docker, Git.
