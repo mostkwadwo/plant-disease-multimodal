@@ -18,7 +18,6 @@ This project implements a **Multimodal Deep Learning Architecture** that fuses *
 
 ## 🏗️ System Architecture
 
-The system uses a **Late Fusion** strategy. Two separate neural networks process the inputs, and their learned features are concatenated to form a rich representation of the plant's health.
 
 ```mermaid
 graph LR
